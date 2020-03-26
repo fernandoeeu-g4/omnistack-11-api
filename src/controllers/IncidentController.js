@@ -7,11 +7,14 @@ module.exports = {
     const [count] = await db('incidents').count();
 
     const incidents = await db('incidents')
+      .join('ongs', 'ongs.id', '=', 'incidents.ong_id')
       .limit(5)
       .offset((page - 1) * 5)
-      .select('*');
+      .select(['incidents.*', 'ongs.name', 'ongs.email', 'ongs.whatsapp', 'ongs.city', 'ongs.uf']);
 
-    res.json({ incidents, count });
+    res.header('X-Total-Tount', count['count(*)']);
+
+    res.json(incidents);
   },
   async create(req, res) {
     const { title, description, value } = req.body;
